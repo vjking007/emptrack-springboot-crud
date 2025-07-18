@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Course
+  datasource:
+    url: jdbc:sqlserver://DESKTOP-I1SMM2J\SQL;databaseName=association;trustServerCertificate=true
+    username: sa
+    password: sql@123
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServer2012Dialect
+    show_sql: true
+    hibernate:
+      ddl-auto: none
