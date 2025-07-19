@@ -28,9 +28,10 @@ public class Employee {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true, nullable = false)
     private String phone;
 
     @Column(name = "hire_date")
