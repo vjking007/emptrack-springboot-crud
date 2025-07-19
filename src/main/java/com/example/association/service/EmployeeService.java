@@ -4,6 +4,7 @@ import com.example.association.configuration.EmployeeMapper;
 import com.example.association.dto.EmployeeRequest;
 import com.example.association.dto.EmployeeResponse;
 import com.example.association.entity.Employee;
+import com.example.association.exception.DuplicateResourceException;
 import com.example.association.exception.ResourceNotFoundException;
 import com.example.association.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +39,10 @@ public class EmployeeService {
     }
 
     public EmployeeResponse create(EmployeeRequest request) {
+
+        checkDuplicate("Email", ()->employeeRepo.existsByEmail(request.getEmail()));
+        checkDuplicate("Phone", ()->employeeRepo.existsByPhone(request.getPhone()));
+
         Employee emp = employeeMapper.toEntity(request);
         emp  =employeeRepo.save(emp);
 
@@ -48,6 +54,9 @@ public class EmployeeService {
         Employee emp = employeeRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + id));
 
+        checkDuplicate("Email", ()->employeeRepo.existsByEmail(request.getEmail()));
+        checkDuplicate("Phone", ()->employeeRepo.existsByPhone(request.getPhone()));
+
         employeeMapper.updateEntity(emp, request);
         return employeeMapper.toResponse(employeeRepo.save(emp));
     }
@@ -57,5 +66,11 @@ public class EmployeeService {
             throw new ResourceNotFoundException("Employee not found with ID: " + id);
         }
         employeeRepo.deleteById(id);
+    }
+
+    private void checkDuplicate(String field, Supplier<Boolean> existsSupplier) {
+        if (existsSupplier.get()) {
+            throw new DuplicateResourceException(field + " already exists");
+        }
     }
 }
